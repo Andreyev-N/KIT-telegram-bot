@@ -9,7 +9,6 @@ import com.kit.wb.wbbot.user.UserManager;
 import com.kit.wb.wbbot.user.UserState;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -18,16 +17,12 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.time.Instant;
-
 @Component
 @Slf4j
 public class WBBot extends TelegramLongPollingBot {
 
 	@Autowired
 	CronJobManager cronJobManager;
-	@Autowired
-	UserManager userManager;
 
 	//@Value("${bot.name}")
 	private final String botUsername = "WBKitBot";
@@ -52,24 +47,24 @@ public class WBBot extends TelegramLongPollingBot {
 		String chatId = message.getChatId().toString();
 		User user = message.getFrom();
 
-		log.info("!! new update from [{}], chatId = [{}]", update.getMessage().getFrom(), chatId);
+		log.info("!! new update from [{}], STATE = [{}]", update.getMessage().getFrom().getUserName(), UserManager.getUserState(user));
 
 		SendMessage response = new SendMessage();
 		response.setChatId(chatId);
 		TelegramHandler handler;
 
-		boolean isUserExist = userManager.add(update);
-		if (!isUserExist){
+		boolean isUserJustAdded = UserManager.add(update);
+		if (isUserJustAdded){
 			handler = new DefaultHandler();
 		} else {
-			UserState state = userManager.getUserState(user);
+			UserState state = UserManager.getUserState(user);
 
 			if(UserState.NONE.equals(state)){
 				handler = new DefaultHandler();
-			} else if(UserState.START.equals(state)){
+			} else if(UserState.START.equals(state) || UserState.TIME_ASK.equals(state) || UserState.TEXT_ASK.equals(state)){
 				handler = new StartHandler();
 			} else {
-				handler = new CronJobHandler();
+				handler = new CronJobHandler(cronJobManager);
 			}
 		}
 

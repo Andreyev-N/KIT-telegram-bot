@@ -1,5 +1,7 @@
 package com.kit.wb.wbbot.handler;
 
+import com.kit.wb.wbbot.user.UserManager;
+import com.kit.wb.wbbot.user.UserState;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -14,7 +16,8 @@ public class DefaultHandler implements TelegramHandler{
 		if(message.getText().equals("/getTime")){
 			response.setText(Instant.now().toString());
 		} else if(message.getText().equals("/start")) {
-			response.setText("Этот раздел еще в разработке");
+			UserManager.updateState(message.getFrom(), UserState.START);
+			response.setText("Хотите запустить напоминание с повтором /repeated или без повтора /once?");
 		}else {
 			response.setText(hello);
 		}

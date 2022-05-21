@@ -13,19 +13,19 @@ public class UserManager {
 
 	private static final Map<Long, UserEntity> users = new HashMap<Long, UserEntity>();
 
-	public boolean isUserExist(User user){
+	public static boolean isUserExist(User user){
 		return users.containsKey(user.getId());
 	}
 
-	public UserEntity getUserEntity(User user){
+	public static UserEntity getUserEntity(User user){
 		return users.get(user.getId());
 	}
 
-	public boolean add(Update update){
+	public static boolean add(Update update){
 		return add(update.getMessage().getFrom(), update.getMessage().getChatId().toString(), UserState.NONE);
 	}
 
-	public boolean add(User user, String chatId, UserState state){
+	public static boolean add(User user, String chatId, UserState state){
 		if(isUserExist(user)){
 			return false;
 		}
@@ -33,7 +33,10 @@ public class UserManager {
 		return true;
 	}
 
-	public UserState getUserState(User user){
+	public static UserState getUserState(User user){
+		if(!isUserExist(user)){
+			return UserState.NONE;
+		}
 		return users.get(user.getId()).getState();
 	}
 

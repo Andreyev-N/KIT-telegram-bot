@@ -4,6 +4,7 @@ public enum UserState {
 	NONE,
 	START,
 	TIME_ASK,
-	JOB_SCHEDULED,
+	TEXT_ASK,
+	JOB_SCHEDULING,
 	JOB;
 }
