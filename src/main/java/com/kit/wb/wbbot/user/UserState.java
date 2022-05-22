@@ -6,5 +6,7 @@ public enum UserState {
 	TIME_ASK,
 	TEXT_ASK,
 	JOB_SCHEDULING,
-	JOB;
+	JOB,
+	CLIENT_INIT,
+	CLIENT;
 }

@@ -1,7 +1,9 @@
 package com.kit.wb.wbbot.message;
 
 import com.kit.wb.wbbot.CredentialUtils;
+import com.kit.wb.wbbot.client.RestClient;
 import com.kit.wb.wbbot.cronJob.CronJobManager;
+import com.kit.wb.wbbot.handler.ClientHandler;
 import com.kit.wb.wbbot.handler.CronJobHandler;
 import com.kit.wb.wbbot.handler.DefaultHandler;
 import com.kit.wb.wbbot.handler.StartHandler;
@@ -24,6 +26,9 @@ public class WBBot extends TelegramLongPollingBot {
 
 	@Autowired
 	CronJobManager cronJobManager;
+
+	@Autowired
+	RestClient restClient;
 
 	//@Value("${bot.name}")
 	private final String botUsername = CredentialUtils.getBotName();
@@ -48,7 +53,7 @@ public class WBBot extends TelegramLongPollingBot {
 		String chatId = message.getChatId().toString();
 		User user = message.getFrom();
 
-		log.info("!! new update from [{}], STATE = [{}]", update.getMessage().getFrom().getUserName(), UserManager.getUserState(user));
+		log.info("!! new update from [{}], STATE = [{}]", update.getMessage().getFrom(), UserManager.getUserState(user));
 
 		SendMessage response = new SendMessage();
 		response.setChatId(chatId);
@@ -62,7 +67,10 @@ public class WBBot extends TelegramLongPollingBot {
 
 			if(UserState.NONE.equals(state)){
 				handler = new DefaultHandler();
-			} else if(UserState.START.equals(state) || UserState.TIME_ASK.equals(state) || UserState.TEXT_ASK.equals(state)){
+			} else if (UserState.CLIENT_INIT.equals(state) || UserState.CLIENT.equals(state)){
+				handler = new ClientHandler(restClient);
+
+			}else if(UserState.START.equals(state) || UserState.TIME_ASK.equals(state) || UserState.TEXT_ASK.equals(state)){
 				handler = new StartHandler();
 			} else {
 				handler = new CronJobHandler(cronJobManager);

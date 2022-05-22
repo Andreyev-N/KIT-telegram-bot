@@ -12,13 +12,16 @@ import java.time.Instant;
 public class DefaultHandler implements TelegramHandler{
 	@Override
 	public String handle(Message message, SendMessage response) {
-		String hello = "Привет! Это личный телеграм бот Андреева Никиты. Введите /start чтобы начать или /getTime чтобы узнать время";
+		String hello = "Привет! Это личный телеграм бот Андреева Никиты. Введите /start_01 чтобы начать или /getTime чтобы узнать время";
 		if(message.getText().equals("/getTime")){
 			response.setText(Instant.now().toString());
 		} else if(message.getText().equals("/start")) {
 			UserManager.updateState(message.getFrom(), UserState.START);
 			response.setText("Хотите запустить напоминание с повтором /repeated или без повтора /once?");
-		}else {
+		} else if(message.getText().equals("/start_01")) {
+			UserManager.updateState(message.getFrom(), UserState.CLIENT_INIT);
+			response.setText("Введите Апи 64 ключ");
+		} else {
 			response.setText(hello);
 		}
 
